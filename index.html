@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyCar Guide Malaysia — Brands, Repairs & Dyno</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f1420; color: #e8ecf3; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #16223a, #0f1420); padding: 40px 20px 30px; text-align: center; border-bottom: 2px solid #2a3a5a; }
+  header h1 { font-size: 2rem; color: #ffd34d; }
+  header p { color: #9fb0cc; margin-top: 8px; }
+  nav { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+  nav a { color: #ffd34d; text-decoration: none; padding: 8px 16px; border: 1px solid #2a3a5a; border-radius: 20px; font-size: .9rem; }
+  nav a:hover { background: #ffd34d; color: #0f1420; }
+  section { max-width: 900px; margin: 0 auto; padding: 48px 20px; }
+  section h2 { color: #ffd34d; font-size: 1.6rem; margin-bottom: 6px; }
+  section .sub { color: #9fb0cc; margin-bottom: 24px; font-size: .95rem; }
+
+  /* Car brand cards */
+  .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .brand-card { background: #1a2438; border: 1px solid #2a3a5a; border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: .2s; }
+  .brand-card:hover, .brand-card.active { border-color: #ffd34d; transform: translateY(-2px); }
+  .brand-card .logo { font-size: 1.6rem; }
+  .brand-card .name { font-weight: bold; margin-top: 6px; }
+  .brand-card .origin { font-size: .75rem; color: #9fb0cc; }
+  #brandDetail { background: #16223a; border: 1px solid #2a3a5a; border-radius: 12px; padding: 24px; display: none; }
+  #brandDetail h3 { color: #ffd34d; margin-bottom: 10px; }
+  #brandDetail ul { list-style: none; }
+  #brandDetail li { padding: 8px 0; border-bottom: 1px solid #22304d; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  #brandDetail li span.type { color: #cdd8ec; font-weight: 600; }
+  #brandDetail li span.info { color: #9fb0cc; font-size: .88rem; text-align: right; }
+
+  /* Parts table */
+  table { width: 100%; border-collapse: collapse; background: #1a2438; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #22304d; font-size: .92rem; }
+  th { background: #22304d; color: #ffd34d; }
+  td .symptom { color: #9fb0cc; font-size: .82rem; }
+  .cost { color: #7ee787; font-weight: 600; white-space: nowrap; }
+  .note { color: #9fb0cc; font-size: .82rem; font-style: italic; }
+  .wear-bar { background: #22304d; border-radius: 6px; height: 8px; width: 120px; display: inline-block; vertical-align: middle; margin-left: 8px; }
+  .wear-bar > div { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #ffd34d, #ff7b54); }
+
+  /* Dyno */
+  .dyno-runs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .dyno-card { background: #1a2438; border: 1px solid #2a3a5a; border-radius: 12px; padding: 20px; }
+  .dyno-card h3 { color: #e8ecf3; font-size: 1.05rem; margin-bottom: 4px; }
+  .dyno-card .mod { color: #9fb0cc; font-size: .85rem; margin-bottom: 14px; }
+  .dyno-stats { display: flex; gap: 20px; }
+  .stat { flex: 1; }
+  .stat .label { font-size: .75rem; color: #9fb0cc; text-transform: uppercase; letter-spacing: 1px; }
+  .stat .before { color: #cdd8ec; font-size: 1.1rem; }
+  .stat .after { color: #7ee787; font-size: 1.5rem; font-weight: bold; }
+  .stat .delta { color: #7ee787; font-size: .8rem; }
+  .bar-wrap { margin-top: 14px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .bar-row .tag { font-size: .72rem; width: 46px; color: #9fb0cc; }
+  .bar-track { flex: 1; background: #22304d; height: 12px; border-radius: 6px; }
+  .bar-fill { height: 100%; border-radius: 6px; }
+  .bar-fill.b { background: #556790; }
+  .bar-fill.a { background: linear-gradient(90deg, #ffd34d, #ff9d54); }
+  footer { text-align: center; color: #556790; padding: 30px; font-size: .8rem; border-top: 1px solid #22304d; }
+  .disclaimer { background: #2b2410; border: 1px solid #5a4a1a; color: #ffd34d; border-radius: 8px; padding: 12px 16px; font-size: .85rem; margin-top: 16px; }
+  @media (max-width: 600px) { table { font-size: .85rem; } th, td { padding: 8px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚗 MyCar Guide Malaysia</h1>
+  <p>Common car brands, repair costs &amp; dyno comparisons — sample data for reference</p>
+  <nav>
+    <a href="#brands">Brands &amp; Types</a>
+    <a href="#repairs">Fixes &amp; Spare Parts</a>
+    <a href="#dyno">Dyno Checker</a>
+  </nav>
+</header>
+
+<!-- SECTION 1: BRANDS -->
+<section id="brands">
+  <h2>Car Brands &amp; Types</h2>
+  <p class="sub">Tap a brand to see sample models common on Malaysian roads. <em>Feature: Browse examples.</em></p>
+  <div class="brand-grid" id="brandGrid"></div>
+  <div id="brandDetail"></div>
+</section>
+
+<!-- SECTION 2: REPAIRS -->
+<section id="repairs">
+  <h2>Common Fixes &amp; Spare Parts</h2>
+  <p class="sub">Typical problems, part lifespan, and rough cost ranges at local workshops (parts + labour, indicative only). <em>Feature: Wear guide.</em></p>
+  <table>
+    <thead>
+      <tr><th>Problem / Part</th><th>Common Symptoms</th><th>Wear Guide</th><th>Est. Cost (RM)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Engine oil &amp; filter change</td>
+        <td class="symptom">Dark oil, service reminder light</td>
+        <td>Every 5,000–10,000 km<span class="wear-bar"><div style="width:20%"></div></span></td>
+        <td class="cost">80 – 250</td>
+      </tr>
+      <tr>
+        <td>Brake pads (front)</td>
+        <td class="symptom">Squealing, longer stopping distance</td>
+        <td>~30,000–50,000 km<span class="wear-bar"><div style="width:45%"></div></span></td>
+        <td class="cost">120 – 350</td>
+      </tr>
+      <tr>
+        <td>Air-cond compressor / regas</td>
+        <td class="symptom">Warm air from vents, weak cooling</td>
+        <td>Regas yearly; compressor 8–10 yrs<span class="wear-bar"><div style="width:75%"></div></span></td>
+        <td class="cost">80 regas / 800–1,500 compressor</td>
+      </tr>
+      <tr>
+        <td>Battery replacement</td>
+        <td class="symptom">Slow crank, dim lights</td>
+        <td>1.5–2 years typical<span class="wear-bar"><div style="width:30%"></div></span></td>
+        <td class="cost">180 – 450</td>
+      </tr>
+      <tr>
+        <td>Tyres (per set of 4)</td>
+        <td class="symptom">Worn tread, uneven wear, vibration</td>
+        <td>~40,000–60,000 km<span class="wear-bar"><div style="width:60%"></div></span></td>
+        <td class="cost">800 – 2,000+</td>
+      </tr>
+      <tr>
+        <td>Suspension — absorbers</td>
+        <td class="symptom">Bouncy ride, knocking over bumps</td>
+        <td>~60,000–80,000 km<span class="wear-bar"><div style="width:70%"></div></span></td>
+        <td class="cost">400 – 1,200 / pair</td>
+      </tr>
+      <tr>
+        <td>Timing belt / chain</td>
+        <td class="symptom">Ticking noise, engine misfire</td>
+        <td>Belt ~80,000–100,000 km<span class="wear-bar"><div style="width:85%"></div></span></td>
+        <td class="cost">350 – 900</td>
+      </tr>
+      <tr>
+        <td>Clutch kit (manual)</td>
+        <td class="symptom">Slipping gears, high pedal effort</td>
+        <td>~100,000 km depending on use<span class="wear-bar"><div style="width:90%"></div></span></td>
+        <td class="cost">600 – 1,500</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="note">Longer bar = part usually lasts longer before needing attention. Costs vary by car brand, parts brand (OEM vs aftermarket), and workshop location.</p>
+</section>
+
+<!-- SECTION 3: DYNO -->
+<section id="dyno">
+  <h2>Dyno Results Checker</h2>
+  <p class="sub">Sample dyno runs showing before vs after HP and torque (Nm). <em>Feature: Dyno compare.</em></p>
+  <div class="dyno-runs" id="dynoRuns"></div>
+  <div class="disclaimer">⚠️ All figures here are <strong>sample/illustrative data</strong> only — real results depend on the car, tune, fuel (RON95/100), weather, and the dyno itself. Always verify with your own run sheet.</div>
+</section>
+
+<footer>MyCar Guide Malaysia · Demo website with sample data · Built for learning purposes</footer>
+
+<script>
+const brands = [
+  { name: "Perodua", origin: "Malaysia", icon: "🇲🇾", models: [
+    ["Myvi", "1.5L hatchback — city car, very popular"],
+    ["Axia", "1.0L hatchback — budget entry car"],
+    ["Bezza", "1.0/1.3L sedan — first-car favourite"],
+    ["Alza", "1.5L MPV — family mover"],
+    ["Ativa", "1.0L turbo SUV — DNGA platform"]] },
+  { name: "Proton", origin: "Malaysia", icon: "🇲🇾", models: [
+    ["Saga", "1.3/1.6L sedan — national classic"],
+    ["Persona", "1.6L sedan — family sedan"],
+    ["Iriz", "1.3/1.6L hatchback"],
+    ["X50", "1.5L turbo SUV — sporty compact SUV"],
+    ["X70", "1.5L turbo SUV — Geely-based family SUV"]] },
+  { name: "Honda", origin: "Japan", icon: "🇯🇵", models: [
+    ["City", "1.5L sedan / hatch, RS turbo variant"],
+    ["Civic", "1.5L turbo sedan — FC/FE gen"],
+    ["HR-V", "1.5L compact SUV"],
+    ["CR-V", "1.5L turbo family SUV"],
+    ["Jazz", "1.5L hatchback (discontinued, still common)"]] },
+  { name: "Toyota", origin: "Japan", icon: "🇯🇵", models: [
+    ["Vios", "1.5L sedan — reliable workhorse"],
+    ["Yaris", "1.5L hatchback"],
+    ["Hilux", "2.4/2.8L diesel pickup"],
+    ["Fortuner", "2.4/2.8L diesel SUV"],
+    ["Innova", "2.0L MPV — family & fleet car"]] },
+  { name: "Nissan", origin: "Japan", icon: "🇯🇵", models: [
+    ["Almera", "1.0L turbo sedan"],
+    ["Navara", "2.5L diesel pickup"],
+    ["X-Trail", "2.0/2.5L SUV"],
+    ["Teana", "2.0/2.5L sedan (older gen)"],
+    ["Grand Livina", "1.8L MPV"]] },
+  { name: "BMW", origin: "Germany", icon: "🇩🇪", models: [
+    ["3 Series (G20)", "320i/330i — sport sedan"],
+    ["5 Series (G30)", "530i — executive sedan"],
+    ["X3", "30i — mid-size SUV"],
+    ["X5", "40i — large luxury SUV"],
+    ["1 Series", "118i — compact hatch"]] },
+  { name: "Mercedes-Benz", origin: "Germany", icon: "🇩🇪", models: [
+    ["C-Class (W205/W206)", "C200/C300 — executive sedan"],
+    ["E-Class (W213)", "E200/E300 — business sedan"],
+    ["GLC", "200/300 — luxury SUV"],
+    ["A-Class", "A200/A250 — compact hatch"],
+    ["CLA", "CLA200 — coupe-style sedan"]] },
+  { name: "Mazda", origin: "Japan", icon: "🇯🇵", models: [
+    ["Mazda 2", "1.5L hatch/sedan — premium city car"],
+    ["Mazda 3", "1.5/2.0L C hatch/sedan"],
+    ["CX-3", "2.0L compact SUV"],
+    ["CX-5", "2.0/2.5L family SUV"],
+    ["CX-30", "2.0L crossover"]] },
+];
+
+const grid = document.getElementById("brandGrid");
+const detail = document.getElementById("brandDetail");
+brands.forEach((b, i) => {
+  const card = document.createElement("div");
+  card.className = "brand-card";
+  card.innerHTML = `<div class="logo">${b.icon}</div><div class="name">${b.name}</div><div class="origin">${b.origin}</div>`;
+  card.onclick = () => {
+    document.querySelectorAll(".brand-card").forEach(c => c.classList.remove("active"));
+    card.classList.add("active");
+    detail.style.display = "block";
+    detail.innerHTML = `<h3>${b.icon} ${b.name} — sample models in Malaysia</h3><ul>` +
+      b.models.map(m => `<li><span class="type">${m[0]}</span><span class="info">${m[1]}</span></li>`).join("") +
+      `</ul>`;
+    detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  };
+  grid.appendChild(card);
+});
+
+const runs = [
+  { car: "Perodua Myvi 1.5 Advance", mod: "Stage-1 ECU tune + open pod filter", hpB: 104, hpA: 118, nmB: 148, nmA: 165 },
+  { car: "Proton X50 1.5 TGDi", mod: "Stage-1 tune + intercooler upgrade", hpB: 175, hpA: 196, nmB: 255, nmA: 290 },
+  { car: "Honda Civic FC 1.5 TC", mod: "Downpipe + Stage-2 tune", hpB: 173, hpA: 205, nmB: 220, nmA: 265 },
+  { car: "BMW 320i G20", mod: "Stage-1 ECU remap (B48 engine)", hpB: 184, hpA: 226, nmB: 300, nmA: 390 },
+  { car: "Toyota Hilux 2.8 Rogue", mod: "Diesel tune + exhaust", hpB: 204, hpA: 238, nmB: 500, nmA: 570 },
+];
+
+document.getElementById("dynoRuns").innerHTML = runs.map(r => {
+  const maxHp = Math.max(r.hpA, r.hpB), maxNm = Math.max(r.nmA, r.nmB);
+  const pct = (v, max) => Math.round(v / max * 100);
+  return `<div class="dyno-card">
+    <h3>${r.car}</h3>
+    <div class="mod">${r.mod}</div>
+    <div class="dyno-stats">
+      <div class="stat"><div class="label">Horsepower</div><div class="before">${r.hpB} HP</div><div class="after">${r.hpA} HP</div><div class="delta">▲ +${r.hpA - r.hpB} HP</div></div>
+      <div class="stat"><div class="label">Torque</div><div class="before">${r.nmB} Nm</div><div class="after">${r.nmA} Nm</div><div class="delta">▲ +${r.nmA - r.nmB} Nm</div></div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-row"><span class="tag">HP</span><div class="bar-track"><div class="bar-fill b" style="width:${pct(r.hpB, maxHp)}%"></div></div></div>
+      <div class="bar-row"><span class="tag"></span><div class="bar-track"><div class="bar-fill a" style="width:${pct(r.hpA, maxHp)}%"></div></div></div>
+      <div class="bar-row"><span class="tag">Nm</span><div class="bar-track"><div class="bar-fill b" style="width:${pct(r.nmB, maxNm)}%"></div></div></div>
+      <div class="bar-row"><span class="tag"></span><div class="bar-track"><div class="bar-fill a" style="width:${pct(r.nmA, maxNm)}%"></div></div></div>
+    </div>
+  </div>`;
+}).join("");
+</script>
+</body>
+</html>
